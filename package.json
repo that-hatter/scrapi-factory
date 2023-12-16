@@ -15,7 +15,7 @@
       "types": "./dist/modules/markdown.d.ts",
       "default": "./dist/modules/markdown.js"
     },
-    "./fp/*": {
+    "./fp": {
       "require": "./dist/modules/fp.js",
       "types": "./dist/modules/fp.d.ts",
       "default": "./dist/modules/fp.js"
