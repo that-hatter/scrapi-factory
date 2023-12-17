@@ -20,12 +20,12 @@ or [added as an `npm` dependency](#as-a-typescript-package) when writing documen
 ### Validating locally
 
 A dump script can be run locally to generate a JSON file with the validated entries, or an error file.
-It only runs Steps 1 - 4 in the [parsing pipeline](/docs/Parsing-Pipeline.md).
+It only runs Steps 1 to 4 in the [parsing pipeline](/docs/Parsing-Pipeline.md).
 
 - Clone the repos. Make sure they're in the same folder.
 
-  - `git clone ProjectIgnis/scrapiyard`
-  - `git clone that-hatter/scrapi-factory`
+  - `git clone https://github.com/ProjectIgnis/scrapiyard`
+  - `git clone https://github.com/that-hatter/scrapi-factory`
 
 > **NOTE:** For now, it's important that they're in the same folder for factory to find the doc files.
 > Later, there will be an option to specify the local directory or remote repo of scrapiyard.
