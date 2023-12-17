@@ -143,10 +143,7 @@ const decodeYamls = (
 // loader
 // ----------------------------------------------------------------------------
 
-type YamlError = {
-  readonly filepath: string;
-  readonly error: string;
-};
+type YamlError = [string, string];
 
 const integrateFilepath = (
   either: E.Either<string, MarkedOutput>,
@@ -155,12 +152,12 @@ const integrateFilepath = (
   pipe(
     either,
     E.bimap(
-      (error) => ({ error, filepath }),
+      (error): YamlError => [filepath, error],
       (ok): MarkedOutputWithFilepath => ({ ...ok, filepath })
     )
   );
 
-export type ParseError = ReadonlyArray<YamlError> | string;
+export type ParseError = RR.ReadonlyRecord<string, string> | string;
 
 const fileAp = E.getApplicativeValidation(RA.getSemigroup<YamlError>());
 
@@ -173,6 +170,7 @@ export const parseFiles = (
     RA.map(loadYaml),
     (results) => RA.zipWith(results, filepaths, integrateFilepath),
     RA.traverse(fileAp)(E.mapLeft(RA.of)), // accumulate errors
+    E.mapLeft(RR.fromEntries),
     E.chainW(decodeYamls)
   );
 };
