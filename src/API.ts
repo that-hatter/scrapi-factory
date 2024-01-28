@@ -128,15 +128,14 @@ const loadYaml = flow(
 
 const decodeYamls = (
   yamls: ReadonlyArray<MarkedOutputWithFilepath>
-): E.Either<string, Dc.TypeOf<typeof codec>> =>
+): E.Either<string | Dc.DecodeError, Dc.TypeOf<typeof codec>> =>
   pipe(
     yamls,
     RNEA.fromReadonlyArray,
     E.fromOption(constant('No valid yamls found')),
     E.map(RNEA.groupBy(({ doctype }) => doctype)),
     E.map(RR.map(RA.toRecord((mo) => mo.filepath))),
-    E.chainW(codec.decode),
-    E.mapLeft((e) => (typeof e === 'string' ? e : Dc.draw(e)))
+    E.chainW(codec.decode)
   );
 
 // ----------------------------------------------------------------------------
@@ -157,7 +156,10 @@ const integrateFilepath = (
     )
   );
 
-export type ParseError = RR.ReadonlyRecord<string, string> | string;
+export type ParseError =
+  | RR.ReadonlyRecord<string, string>
+  | string
+  | Dc.DecodeError;
 
 const fileAp = E.getApplicativeValidation(RA.getSemigroup<YamlError>());
 
