@@ -164,11 +164,16 @@ export const stringifyError = (error: ParseError): string =>
     : error instanceof Map
     ? pipe(
         [...error.entries()],
-        RA.reduce(
-          '',
-          (acc, [filepath, errStr]) => acc + '\n\n' + filepath + '\n' + errStr
+        RA.map(
+          ([filepath, errStr]) =>
+            filepath +
+            '\n' +
+            errStr
+              .split('\n')
+              .map((ln) => '  ' + ln)
+              .join('\n')
         )
-      )
+      ).join('\n\n')
     : Dc.draw(error);
 
 const fileAp = E.getApplicativeValidation(RA.getSemigroup<YamlError>());
