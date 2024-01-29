@@ -21,6 +21,7 @@ export {
   finalize as finalizeAPI,
   parseFiles,
   parseFilesAndFinalize,
+  stringifyError as stringifyAPIError,
 } from './API';
 
 export type { Alias, BindingInfo, Status } from './shared/info/BindingInfo';

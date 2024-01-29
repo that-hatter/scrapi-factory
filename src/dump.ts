@@ -2,20 +2,19 @@ import * as sf from '.';
 import { joinPath, mkdir, writeFile } from './FileSystem';
 import { E, TE, flow, pipe } from './modules/fp';
 
-const stringify = (val: unknown) =>
-  typeof val === 'string' ? val : JSON.stringify(val, null, 2);
+const stringifyJSON = (val: unknown) => JSON.stringify(val, null, 2);
 
-const getDumpPath = (subdir: string) =>
-  joinPath(['.', 'dump', subdir + '.json']);
+const getDumpPath = (subdir: string) => joinPath(['.', 'dump', subdir]);
 
-const dumpJSON = flow(getDumpPath, writeFile);
+const dumpFile = flow(getDumpPath, writeFile);
 
 const program = pipe(
   mkdir(joinPath(['.', 'dump'])),
   TE.chain(() => sf.loadRawAPI(sf.DEFAULT_OPTIONS.directory)),
-  TE.bimap(stringify, stringify),
-  TE.tap(dumpJSON('api')),
-  TE.tapError(dumpJSON('error'))
+  TE.map(stringifyJSON),
+  TE.tap(dumpFile('api.json')),
+  TE.mapError(sf.stringifyAPIError),
+  TE.tapError(dumpFile('error.txt'))
 );
 
 // ----------------------------------------------------------------------------

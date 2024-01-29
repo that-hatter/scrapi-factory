@@ -128,22 +128,21 @@ const loadYaml = flow(
 
 const decodeYamls = (
   yamls: ReadonlyArray<MarkedOutputWithFilepath>
-): E.Either<string, Dc.TypeOf<typeof codec>> =>
+): E.Either<string | Dc.DecodeError, Dc.TypeOf<typeof codec>> =>
   pipe(
     yamls,
     RNEA.fromReadonlyArray,
     E.fromOption(constant('No valid yamls found')),
     E.map(RNEA.groupBy(({ doctype }) => doctype)),
     E.map(RR.map(RA.toRecord((mo) => mo.filepath))),
-    E.chainW(codec.decode),
-    E.mapLeft((e) => (typeof e === 'string' ? e : Dc.draw(e)))
+    E.chainW(codec.decode)
   );
 
 // ----------------------------------------------------------------------------
 // loader
 // ----------------------------------------------------------------------------
 
-type YamlError = [string, string];
+type YamlError = Readonly<[string, string]>;
 
 const integrateFilepath = (
   either: E.Either<string, MarkedOutput>,
@@ -157,7 +156,25 @@ const integrateFilepath = (
     )
   );
 
-export type ParseError = RR.ReadonlyRecord<string, string> | string;
+export type ParseError = Map<string, string> | string | Dc.DecodeError;
+
+export const stringifyError = (error: ParseError): string =>
+  typeof error === 'string'
+    ? error
+    : error instanceof Map
+    ? pipe(
+        [...error.entries()],
+        RA.map(
+          ([filepath, errStr]) =>
+            filepath +
+            '\n' +
+            errStr
+              .split('\n')
+              .map((ln) => '  ' + ln)
+              .join('\n')
+        )
+      ).join('\n\n')
+    : Dc.draw(error);
 
 const fileAp = E.getApplicativeValidation(RA.getSemigroup<YamlError>());
 
@@ -170,8 +187,8 @@ export const parseFiles = (
     RA.map(loadYaml),
     (results) => RA.zipWith(results, filepaths, integrateFilepath),
     RA.traverse(fileAp)(E.mapLeft(RA.of)), // accumulate errors
-    E.mapLeft(RR.fromEntries),
-    E.chainW(decodeYamls)
+    E.mapLeft((entries) => new Map(entries)),
+    E.flatMap(decodeYamls)
   );
 };
 
