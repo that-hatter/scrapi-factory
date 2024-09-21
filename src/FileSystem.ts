@@ -1,6 +1,6 @@
 import * as TE from 'fp-ts/TaskEither';
-import fs from 'fs';
-import path from 'path';
+import fs from 'node:fs/promises';
+import path from 'node:path';
 import * as RA from './modules/fp-ts-extended/ReadonlyArray';
 import * as RNEA from './modules/fp-ts-extended/ReadonlyNonEmptyArray';
 import { pipe } from './modules/fp-ts-extended/function';
@@ -17,7 +17,7 @@ export const relativePath = (parent: string, sub: string) =>
 
 export type LocalFile = Readonly<[string, string]>;
 
-const readFileTask = TE.tryCatchK(fs.promises.readFile, toErrorString);
+const readFileTask = TE.tryCatchK(fs.readFile, toErrorString);
 
 export const readFile = (path: string): TE.TaskEither<string, LocalFile> =>
   pipe(
@@ -25,12 +25,12 @@ export const readFile = (path: string): TE.TaskEither<string, LocalFile> =>
     TE.map((content) => [String(content), path])
   );
 
-const writeFileTask = TE.tryCatchK(fs.promises.writeFile, toErrorString);
+const writeFileTask = TE.tryCatchK(fs.writeFile, toErrorString);
 
 export const writeFile = (path: string) => (content: string) =>
   writeFileTask(path, content);
 
-const mkdirTask = TE.tryCatchK(fs.promises.mkdir, toErrorString);
+const mkdirTask = TE.tryCatchK(fs.mkdir, toErrorString);
 
 export const mkdir = (path: string) => mkdirTask(path, { recursive: true });
 
@@ -38,10 +38,7 @@ export const getAllPaths = (
   dir: string
 ): TE.TaskEither<string, ReadonlyArray<string>> =>
   pipe(
-    TE.tryCatch(
-      () => fs.promises.readdir(dir, { withFileTypes: true }),
-      toErrorString
-    ),
+    TE.tryCatch(() => fs.readdir(dir, { withFileTypes: true }), toErrorString),
     TE.map(
       RA.map((ent) => {
         const sdir = joinPath([dir, ent.name]);
