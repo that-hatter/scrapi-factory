@@ -1,6 +1,6 @@
 import * as NEA from 'fp-ts/NonEmptyArray';
 import * as Decoder from 'io-ts/Decoder';
-import { O, RA, RNEA, RR, identity, pipe } from '../modules/fp';
+import { E, O, RA, RNEA, RR, identity, pipe } from '../modules/fp';
 import * as md from '../modules/markdown';
 
 export const uniqBy =
@@ -71,7 +71,15 @@ export const nonKeyword = Decoder.fromRefinement(
 export const expression = pipe(
   Decoder.union(
     Decoder.boolean,
-    pipe(Decoder.number, Decoder.map(BigInt)),
+    pipe(
+      Decoder.number,
+      Decoder.parse((n) =>
+        E.tryCatch(
+          () => BigInt(n),
+          () => Decoder.error(n, 'integer')
+        )
+      )
+    ),
     Decoder.literal('nil'),
     pipe(
       Decoder.string,
