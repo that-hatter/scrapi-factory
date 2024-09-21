@@ -80,13 +80,19 @@ export type Raw = Decoder.TypeOf<typeof codec>;
 
 export const finalize =
   (raw: Raw) =>
-  (sr: SourceRecord): BindingInfo => ({
-    name: raw.name,
-    status: finalizeStatus(raw.status),
-    aliases: RA.map(finalizeAlias)(raw.aliases ?? []),
-    aliasOf: O.none,
-    source: O.fromNullable(sr[raw.name]),
-  });
+  (sr: SourceRecord): BindingInfo => {
+    const aliases = RA.map(finalizeAlias)(raw.aliases ?? []);
+    return {
+      name: raw.name,
+      status: finalizeStatus(raw.status),
+      aliases,
+      aliasOf: O.none,
+      source: pipe(
+        [raw, ...aliases],
+        RA.findFirstMap((a) => O.fromNullable(sr[a.name]))
+      ),
+    };
+  };
 
 export const appendAllAliases =
   <T extends BindingInfo>(aliasFn: (main: T) => (alias: Alias) => T) =>
