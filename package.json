@@ -26,6 +26,9 @@
     "build": "npx tsc",
     "dump": "npm run build && node dist/dump"
   },
+  "bin": {
+    "dump": "dist/dump.js"
+  },
   "keywords": [
     "edopro",
     "scrapi",
@@ -53,7 +56,8 @@
     "eslint": "^8.33.0",
     "eslint-config-prettier": "^8.5.0",
     "eslint-plugin-functional": "^5.0.0",
-    "prettier": "^2.6.2"
+    "prettier": "^2.6.2",
+    "typescript": "^5.1.6"
   },
   "dependencies": {
     "@kaciras/deasync": "^1.0.3",
@@ -65,7 +69,6 @@
     "mdast-util-gfm": "^3.0.0",
     "mdast-util-to-markdown": "^2.1.0",
     "node-fetch": "^2.6.9",
-    "typescript": "^5.1.6",
     "unist-util-remove-position": "^5.0.0"
   }
 }

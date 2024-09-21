@@ -17,11 +17,11 @@ export {
   APIGroup,
   ParseError as APIParseError,
   DocType,
-  Topic,
   finalize as finalizeAPI,
   parseFiles,
   parseFilesAndFinalize,
   stringifyError as stringifyAPIError,
+  Topic,
 } from './API';
 
 export type { Alias, BindingInfo, Status } from './shared/info/BindingInfo';
@@ -92,7 +92,7 @@ export type YardOptions = {
 } & SourceRecord.Options;
 
 export const DEFAULT_OPTIONS: YardOptions = {
-  directory: FS.joinPath([process.cwd(), '..', 'scrapiyard', 'api']),
+  directory: FS.joinPath([process.cwd(), 'api']),
   ...DEFAULT_SOURCE_OPTIONS,
 };
 
