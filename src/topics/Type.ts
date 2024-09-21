@@ -150,7 +150,15 @@ type OtherTypeInfo = { readonly supertype: O.Option<string> };
 
 export type OtherType = TypeCommonInfo & OtherTypeInfo;
 
-const otherTypeInfoCodec = Decoder.partial({ supertype: dc.typename });
+const otherTypeInfoCodec = Decoder.partial({
+  supertype: pipe(
+    dc.typename,
+    Decoder.refine(
+      (t): t is string => t !== 'function' && t !== 'table',
+      'non-table and non-function'
+    )
+  ),
+});
 
 const finalizeOtherTypeInfo = (
   raw: Decoder.TypeOf<typeof otherTypeInfoCodec>
