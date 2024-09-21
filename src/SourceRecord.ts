@@ -107,7 +107,7 @@ const coreSourceName = (md: O.Option<string>) => (line: string) =>
     ),
     O.map(([macro, name]) => {
       // hardcode macros that modify the function names passed to them
-      if (macro === 'INFO_FUNC_FROM_CODE') return 'Get' + name + 'FromCode';
+      if (macro === 'INFO_FUNC_FROM_CODE') return 'GetCard' + name + 'FromCode';
       return name;
     }),
     O.map((name) => (O.isSome(md) ? md.value + '.' + name : name))
