@@ -82,16 +82,20 @@ export const finalize =
   (raw: Raw) =>
   (sr: SourceRecord): BindingInfo => {
     const aliases = RA.map(finalizeAlias)(raw.aliases ?? []);
-    return {
-      name: raw.name,
-      status: finalizeStatus(raw.status),
-      aliases,
-      aliasOf: O.none,
-      source: pipe(
-        [raw, ...aliases],
-        RA.findFirstMap((a) => O.fromNullable(sr[a.name]))
-      ),
-    };
+    const status = finalizeStatus(raw.status);
+    const source = pipe(
+      [raw, ...aliases],
+      RA.findFirstMap(({ name }) =>
+        pipe(
+          O.fromNullable(sr[name]),
+          // special case: https://github.com/ProjectIgnis/scrapiyard/blob/master/api/namespaces/Auxiliary.yml#L2
+          // can be made non-hardcoded later by resolving namespace aliases,
+          // but this function would need access to all the raw namespaces
+          O.orElse(() => O.fromNullable(sr[name.replace('aux.', 'Auxiliary.')]))
+        )
+      )
+    );
+    return { name: raw.name, status, aliases, aliasOf: O.none, source };
   };
 
 export const appendAllAliases =
