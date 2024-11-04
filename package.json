@@ -70,5 +70,8 @@
     "mdast-util-to-markdown": "^2.1.0",
     "node-fetch": "^2.6.9",
     "unist-util-remove-position": "^5.0.0"
+  },
+  "overrides": {
+    "whatwg-url": "14.x"
   }
 }
