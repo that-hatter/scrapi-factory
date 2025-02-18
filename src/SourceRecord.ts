@@ -1,4 +1,3 @@
-import { Octokit } from '@octokit/rest';
 import { sequenceT } from 'fp-ts/Apply';
 import * as O from 'fp-ts/Option';
 import * as RA from 'fp-ts/ReadonlyArray';
@@ -21,10 +20,14 @@ type GitRepo = {
 };
 
 const auth = process.env.GITHUB_TOKEN;
-const ghRest = (auth ? new Octokit({ auth }) : new Octokit()).rest.repos;
-const fetchGithubDir = TE.tryCatchK(
-  ({ owner, repo }: GitRepo) => ghRest.getContent({ owner, repo, path: '.' }),
-  FS.toErrorString
+const fetchGithubDir = pipe(
+  TE.tryCatchK(
+    ({ owner, repo }: GitRepo) =>
+      import('@octokit/rest')
+        .then(({ Octokit }) => (auth ? new Octokit({ auth }) : new Octokit()))
+        .then((gh) => gh.rest.repos.getContent({ owner, repo, path: '.' })),
+    FS.toErrorString
+  )
 );
 
 type GitFile = {

@@ -61,7 +61,7 @@
   },
   "dependencies": {
     "@kaciras/deasync": "^1.0.3",
-    "@octokit/rest": "^19.0.7",
+    "@octokit/rest": "^21.1.1",
     "fp-ts": "^2.13.1",
     "io-ts": "^2.2.20",
     "js-yaml": "^4.1.0",
